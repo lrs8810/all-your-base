@@ -6,60 +6,31 @@ const configuration = require('../../../knexfile')[environment];
 const database = require('knex')(configuration);
 
 router.post('/', (request, response) => {
-  const apiKey = request.body
+  const apiKey = request.body.api_key
+  const location = request.body.location
 
-  for (let requiredParameter of ['api_key']) {
-    if (!apiKey[requiredParameter]) {
-      return response
-      .status(422)
-      .send({ error: `Expected format: { apiKey: <String>}. You're missing a "${requiredParameter}" property.` })
-    }
+  if (!apiKey) {
+    return response.status(401).json({ error: `Unauthorized access` })
   }
 
+  if (!location) {
+    return response.status(400).json({ error: `Please provide a location.` })
+  }
 
   database('users')
-    .where('api_key', apiKey['api_key'])
-    .select()
+    .where('api_key', apiKey).select()
     .then(user => {
-      if (user.length) {
-        response.send(user)
+      if (user.length === 0) {
+        response.status(401).json({ error: `Unauthorized access` })
       } else {
-        response.status(404).json({
-          error: `Could not find user with api_key ${request.body.api_key}`
-        })
+        database('favorites').insert({ location: location, user_id: user[0].id }, 'id')
+          .then(favorite => {
+            response.status(201).json({ message: `${location} has been added to your favorites`})
+          })
       }
+    }).catch(error => {
+      response.status(500).json({ error: `Couldn't add ${location} to favorites.` })
     })
-  // database('users').where("api_key", apiKey).first
-  //  .then(user =>  {
-  //    // is user is null
-  //         // return 403
-  //
-  //  })
-
-   // location = request.query.location
-   // validate location, else return
-
-   // fetch ("google?=loc")
-   // .then(loc.info  => {
-        // if response.status return
-        // else
-        // fetch('darksky?=latlong')
-        // .then(darksky.result =>{
-        // response.send(darksky.results)
-      // })
-
- // })
-
-
-
-
 });
-
-// steps
-// 1. validate user
-// 2. get location (lat, long from Geocode)
-// 3. add location to favorites table with user_id
-// 4. return success/error responses
-
 
 module.exports = router;
