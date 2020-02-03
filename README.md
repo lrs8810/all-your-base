@@ -1,6 +1,6 @@
 ## Introduction
 
-Express Sweather Weather is an Express API that consists of four endpoints. These endpoints are exposed when requested with a valid API key. The endpoints include location specific forecast data, the ability to add favorite locations, list favorite locations, and delete favorite locations. Weather data exposed in this API is from [Darksky API](https://darksky.net/dev) and locations are verified with [Google's Geocode API](https://developers.google.com/maps/documentation/geocoding/start).
+Express Sweather Weather is an Express API that consists of four endpoints. These endpoints return successful responses when requested with a valid API key. The endpoints include location specific forecast data, the ability to add favorite locations, list favorite locations, and delete favorite locations. Weather data exposed in this API is from [Darksky API](https://darksky.net/dev) and locations are verified with [Google's Geocode API](https://developers.google.com/maps/documentation/geocoding/start).
 
 ## Initial Setup
 #### Dependencies
@@ -9,7 +9,7 @@ You can `fork` or `clone` this repo. Once you have done that, you’ll need to r
 `npm install`
 
 #### Set up your local database
-This project uses a postgres data. You’ll need to access your own Postgres instance by typing in `psql` into your terminal. Once there, you can create your database by running the command `CREATE DATABASE sweater_weather_dev;` You can also change the name of the database to that of your choosing, but also update it in the `knexfile.js` within the root of the project. 
+This project uses a Postgres database. You’ll need to access your own Postgres instance by typing in `psql` into your terminal. Once there, you can create your database by running the command `CREATE DATABASE sweater_weather_dev;` You can also change the name of the database to that of your choosing, but you will need to also update it in `development` section of the `knexfile.js` within the root of this project. 
 
 #### Migrations
 Once you have your database setup, you can run the two migrations for your `users` and `favorites` tables. Please see the Schema below for more information. You can do this by running the following command: 
@@ -21,7 +21,7 @@ You can also seed the database with one user by running the following command:
 `knex seed:run`
 
 #### API keys
-As mentioned before, this project consumes the [Darksky API](https://darksky.net/dev) and [Google's Geocode API](https://developers.google.com/maps/documentation/geocoding/start) endpoints. You will need to create a `dotenv` file and store your API keys in there are `GOOGLE_API_KEY=key` and `DARKSKY_API_KEY=key` respectively. 
+As mentioned before, this project consumes the [Darksky API](https://darksky.net/dev) and [Google's Geocode API](https://developers.google.com/maps/documentation/geocoding/start) endpoints. You will need to create a `dotenv` file and store your API keys in there as `GOOGLE_API_KEY=key` and `DARKSKY_API_KEY=key`. 
 
 ## Endpoints 
 #### Favoriting a City 
