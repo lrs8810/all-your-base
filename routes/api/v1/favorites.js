@@ -14,26 +14,29 @@ router.get('/', (request, response) => {
   if (!apiKey) {
     return response.status(401).json({ error: `Unauthorized access` })
   }
-  //
-  // // 2. Look up API key in the database
+
+  // 2. Look up API key in the database
   database('users')
     .where('api_key', apiKey).first()
     .then(user => {
       if (!user) {
         response.status(401).json({ error: `Unauthorized access` })
       } else {
+
+  // 3. Retrieve favorites associated with this user
         database('favorites').where('user_id', user.id).select()
           .then(favorites => {
+  // 4. Map over favorites array and fetch darksky data
             var favArray = favorites.map(fav => {
-              fetch(`https://api.darksky.net/forecast/${process.env.DARKSKY_API_KEY}/${fav.lat},${fav.lng}`)
-              .then(response => response.json())
-              .then(result => new Forecast(fav.location, result).currentWeather())
-              // .catch(error => response.status(500).json({ error: console.log(error) }))
+              return fetch(`https://api.darksky.net/forecast/${process.env.DARKSKY_API_KEY}/${fav.lat},${fav.lng}`)
+                .then(response => response.json())
+  // 5. Format favorites weather data
+                .then(result => new Forecast(fav.location, result).currentWeather())
+              return fav
             })
+  // 6. Return all formated favorites
             Promise.all(favArray)
-            .then(results => {
-              console.log(results)
-              response.status(200).json(results)})
+            .then(results => response.status(200).json(results))
             .catch(error => response.status(500).json({ error: console.log(error) }))
           })
         .catch(error => response.status(500).json({ error: console.log(error) }))
@@ -93,7 +96,7 @@ router.post('/', (request, response) => {
 router.delete('/', (request, response) =>{
   const apiKey = request.body.api_key
   const location = request.body.location
-
+  // 1. validate user has sent an API key and location with request
   if (!apiKey) {
     return response.status(401).json({ error: `Unauthorized access` })
   }
@@ -101,7 +104,7 @@ router.delete('/', (request, response) =>{
   if (!location) {
     return response.status(400).json({ error: `Please provide a location` })
   }
-
+  // 2. Find location associated with user and delete
   database('users')
     .where('api_key', apiKey).first()
     .then(user => {
