@@ -6,6 +6,13 @@ class Forecast {
     this.daily = this.formatDaily(data.daily);
   }
 
+  currentWeather() {
+    return {
+      location: this.location,
+      current_weather: this.currently
+    }
+  }
+
   formatCurrentWeather(data) {
     return {
       summary: data.summary,
