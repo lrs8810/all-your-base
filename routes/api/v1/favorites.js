@@ -90,4 +90,36 @@ router.post('/', (request, response) => {
         })
 });
 
+router.delete('/', (request, response) =>{
+  const apiKey = request.body.api_key
+  const location = request.body.location
+
+  if (!apiKey) {
+    return response.status(401).json({ error: `Unauthorized access` })
+  }
+
+  if (!location) {
+    return response.status(400).json({ error: `Please provide a location` })
+  }
+
+  database('users')
+    .where('api_key', apiKey).first()
+    .then(user => {
+      if (user) {
+        database('favorites').where({location: location, user_id: user.id}).del()
+          .then(status => {
+            if (status === 1) {
+              response.status(204).json({ status: 204 })
+            } else {
+              response.status(400).json({ error: `That location does not exist`})
+            }
+          })
+          .catch(error => { error: console.log(error) })
+        } else {
+          return response.status(401).json({ error: `Unauthorized access` })
+        }
+      })
+    .catch(error => { error: console.log(error) })
+});
+
 module.exports = router;
